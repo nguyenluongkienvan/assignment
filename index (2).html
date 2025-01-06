@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh Sách Nhiệm Vụ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .task-list {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+        }
+        .task-item {
+            background-color: #f9f9f9;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Danh Sách Nhiệm Vụ</h1>
+        
+        <div class="input-container">
+            <input type="text" id="task-input" placeholder="Nhập nhiệm vụ...">
+            <button onclick="addTask()">Thêm</button>
+        </div>
+
+        <ul class="task-list" id="task-list"></ul>
+    </div>
+
+    <script>
+        // Tải danh sách nhiệm vụ từ Local Storage khi trang tải
+        window.onload = function() {
+            loadTasks();
+        };
+
+        // Hàm thêm nhiệm vụ vào danh sách
+        function addTask() {
+            const taskInput = document.getElementById('task-input');
+            const taskText = taskInput.value.trim();
+
+            if (taskText) {
+                const task = {
+                    id: Date.now(),
+                    text: taskText
+                };
+
+                saveTaskToLocalStorage(task);
+                addTaskToPage(task);
+
+                taskInput.value = ''; // Xóa ô nhập sau khi thêm
+            } else {
+                alert('Vui lòng nhập nhiệm vụ!');
+            }
+        }
+
+        // Lưu nhiệm vụ vào Local Storage
+        function saveTaskToLocalStorage(task) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Hiển thị nhiệm vụ lên trang
+        function addTaskToPage(task) {
+            const taskList = document.getElementById('task-list');
+            const taskItem = document.createElement('li');
+            taskItem.classList.add('task-item');
+            taskItem.setAttribute('data-id', task.id);
+            taskItem.innerHTML = `
+                <span>${task.text}</span>
+                <button class="delete-btn" onclick="deleteTask(${task.id})">Xóa</button>
+            `;
+            taskList.appendChild(taskItem);
+        }
+
+        // Tải danh sách nhiệm vụ từ Local Storage
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => {
+                addTaskToPage(task);
+            });
+        }
+
+        // Xóa nhiệm vụ khỏi Local Storage và giao diện
+        function deleteTask(id) {
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks = tasks.filter(task => task.id !== id);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            const taskItem = document.querySelector(`.task-item[data-id="${id}"]`);
+            if (taskItem) {
+                taskItem.remove();
+            }
+        }
+    </script>
+
+</body>
+</html>
